@@ -60,7 +60,7 @@ function BoxedLetter(props: {
 
 function Canvas(props: { app: App }): JSX.Element {
     return (
-        <div className="canvas relative w-300 h-300 bg-gray-200">
+        <div className="canvas relative w-300 h-300 bg-white-200">
             {props.app.letters.map((letter) => (
                 <BoxedLetter
                     key={letter.id}
@@ -156,11 +156,10 @@ function ReactApp(props: {
 
     const canvasStyle: React.CSSProperties = {
         position: 'fixed',
-        top: 0,
+        top: 100,
         left: 0,
         width: '100%',
         height: '100%',
-        paddingTop: '100px',
     };
 
     return (
@@ -170,8 +169,10 @@ function ReactApp(props: {
                 connectionState={connectionState}
                 clientId={'testUser'}
             />
-            <TopRow app={appRoot} />
-            <div style={canvasStyle}>
+            <div className="top-row z-10">
+                <TopRow app={appRoot} />
+            </div>
+            <div className="canvas z-0" style={canvasStyle}>
                 <Canvas app={appRoot} />
             </div>
         </div>
