@@ -9,98 +9,87 @@ import {
 import { initializeDevtools } from '@fluid-experimental/devtools';
 import { devtoolsLogger } from './infra/clientProps';
 import { ISharedTree } from '@fluid-experimental/tree2';
-import { appSchemaConfig, App } from './app_schema';
+import { appSchemaConfig, App, letter, Letter } from './app_schema';
 import { SharedTree } from './infra/fluid';
 import { ConnectionState, IFluidContainer } from 'fluid-framework';
 import { node as Tree } from '@fluid-experimental/tree2';
 import './output.css';
 
-type LetterProps = {
-    letter: string;
-    onClick: (letter: string) => void;
-    isOnCanvas: boolean;
-};
-
-type CanvasProps = {
-    letters: string[];
-    onLetterClick: (letter: string) => void;
-};
-
-type TopRowProps = {
-    selectedLetters: string[];
-    onLetterClick: (letter: string) => void;
-};
-
-// Helper function to generate random positions
-const getRandomPosition = (
-    elementWidth: number,
-    elementHeight: number,
-    canvasWidth: number,
-    canvasHeight: number
-) => {
-    const x = Math.floor(Math.random() * (canvasWidth - elementWidth));
-    const y = Math.floor(Math.random() * (canvasHeight - elementHeight));
+function getRandomPosition(letterSize: number) {
+    // Use the window's innerWidth and innerHeight to fill the browser
+    const x = Math.floor(Math.random() * (window.innerWidth - letterSize));
+    const y = Math.floor(Math.random() * (window.innerHeight - letterSize));
     return { x, y };
-};
+}
 
-// The Letter component represents a single letter
-const Letter: React.FC<LetterProps> = ({ letter, onClick, isOnCanvas }) => {
-    // Only calculate random position if the letter is on the canvas
-    const position = isOnCanvas
-        ? getRandomPosition(50, 50, 300, 300) // Assuming each letter is 50x50 and canvas is 300x300
+function BoxedLetter(props: {
+    app: App;
+    letter: Letter;
+    isOnCanvas: boolean;
+}): JSX.Element {
+    const position = props.isOnCanvas
+        ? { x: props.letter.x, y: props.letter.y }
         : { x: 0, y: 0 };
 
-    // Using React.CSSProperties to ensure type safety
-    const style: React.CSSProperties = isOnCanvas
+    const style: React.CSSProperties = props.isOnCanvas
         ? {
               position: 'absolute',
-              left: position.x, // TypeScript will interpret this as `px`
-              top: position.y, // TypeScript will interpret this as `px`
+              left: `${position.x}px`,
+              top: `${position.y}px`,
           }
         : {};
 
     return (
         <div
-            className={`letter ${isOnCanvas ? 'cursor-pointer' : 'm-1'}`}
+            className={`letter ${props.isOnCanvas ? 'cursor-pointer' : 'm-1'}`}
             style={style}
-            onClick={() => onClick(letter)}
+            onClick={() => {
+                const letterSource =
+                    Tree.parent(props.letter) === props.app.word
+                        ? props.app.word
+                        : props.app.letters;
+                const letterDst =
+                    letterSource === props.app.letters
+                        ? props.app.word
+                        : props.app.letters;
+                const index = letterSource.indexOf(props.letter);
+                letterDst.moveToEnd(index, letterSource);
+            }}
         >
-            {letter}
+            {props.letter.character}
         </div>
     );
-};
+}
 
-// The Canvas component represents the area where letters are spread randomly
-const Canvas: React.FC<CanvasProps> = ({ letters, onLetterClick }) => {
+function Canvas(props: { app: App }): JSX.Element {
     return (
         <div className="canvas relative w-300 h-300 bg-gray-200">
-            {letters.map((letter) => (
-                <Letter
-                    key={letter}
+            {props.app.letters.map((letter) => (
+                <BoxedLetter
+                    key={letter.id}
+                    app={props.app}
                     letter={letter}
-                    onClick={onLetterClick}
                     isOnCanvas={true}
                 />
             ))}
         </div>
     );
-};
+}
 
-// The TopRow component represents the area where clicked letters are collected
-const TopRow: React.FC<TopRowProps> = ({ selectedLetters, onLetterClick }) => {
+function TopRow(props: { app: App }): JSX.Element {
     return (
         <div className="top-row flex justify-center bg-gray-300 p-4">
-            {selectedLetters.map((letter) => (
-                <Letter
-                    key={letter}
+            {props.app.word.map((letter) => (
+                <BoxedLetter
+                    key={letter.character}
+                    app={props.app}
                     letter={letter}
-                    onClick={onLetterClick}
                     isOnCanvas={false}
                 />
             ))}
         </div>
     );
-};
+}
 
 function Header(props: {
     saved: boolean;
@@ -168,37 +157,15 @@ function ReactApp(props: {
         props.container.on('disposed', updateConnectionState);
     }, []);
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const [canvasLetters, setCanvasLetters] = useState<string[]>(alphabet);
-    const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
-
-    // Function to handle letter clicks to move from canvas to top row or vice versa
-    const handleLetterClick = (clickedLetter: string) => {
-        if (canvasLetters.includes(clickedLetter)) {
-            setCanvasLetters(
-                canvasLetters.filter((letter) => letter !== clickedLetter)
-            );
-            setSelectedLetters([...selectedLetters, clickedLetter]);
-        } else {
-            setSelectedLetters(
-                selectedLetters.filter((letter) => letter !== clickedLetter)
-            );
-            setCanvasLetters([...canvasLetters, clickedLetter]);
-        }
-    };
-
     return (
-        <div className="app flex flex-col items-center pt-10">
+        <div className="app flex flex-col items-center w-full h-full">
             <Header
                 saved={saved}
                 connectionState={connectionState}
                 clientId={'testUser'}
             />
-            <TopRow
-                selectedLetters={selectedLetters}
-                onLetterClick={handleLetterClick}
-            />
-            <Canvas letters={canvasLetters} onLetterClick={handleLetterClick} />
+            <TopRow app={appRoot} />
+            <Canvas app={appRoot} />
         </div>
     );
 }
@@ -229,6 +196,28 @@ async function main() {
         container.initialObjects.appData,
         appSchemaConfig
     );
+
+    if (containerId.length == 0) {
+        let id = 0;
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            .repeat(5)
+            .split('')
+            .map((character) => {
+                const pos = getRandomPosition(50);
+                appData.root.letters.insertAtEnd(
+                    // TODO: error when not adding wrapping [] is inscrutable
+                    [
+                        letter.create({
+                            x: pos.x,
+                            y: pos.y,
+                            character,
+                            id: id.toString(),
+                        }),
+                    ]
+                );
+                id++;
+            });
+    }
 
     // Initialize debugging tools
     initializeDevtools({
