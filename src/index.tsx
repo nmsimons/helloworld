@@ -9,18 +9,11 @@ import {
 import { initializeDevtools } from '@fluid-experimental/devtools';
 import { devtoolsLogger } from './infra/clientProps';
 import { ISharedTree } from '@fluid-experimental/tree2';
-import { appSchemaConfig, App, letter, Letter } from './app_schema';
+import { appSchemaConfig, App, letter, Letter } from './schema';
 import { SharedTree } from './infra/fluid';
 import { ConnectionState, IFluidContainer } from 'fluid-framework';
 import { node as Tree } from '@fluid-experimental/tree2';
 import './output.css';
-
-function getRandomPosition(letterSize: number) {
-    // Use the window's innerWidth and innerHeight to fill the browser
-    const x = Math.floor(Math.random() * (window.innerWidth - letterSize));
-    const y = Math.floor(Math.random() * (window.innerHeight - letterSize));
-    return { x, y };
-}
 
 function BoxedLetter(props: {
     app: App;
@@ -30,6 +23,10 @@ function BoxedLetter(props: {
     const position = props.isOnCanvas
         ? { x: props.letter.x, y: props.letter.y }
         : { x: 0, y: 0 };
+
+    const letterClasses = `letter ${
+        props.isOnCanvas ? 'cursor-pointer text-base' : 'm-1 text-xl'
+    }`;
 
     const style: React.CSSProperties = props.isOnCanvas
         ? {
@@ -41,7 +38,7 @@ function BoxedLetter(props: {
 
     return (
         <div
-            className={`letter ${props.isOnCanvas ? 'cursor-pointer' : 'm-1'}`}
+            className={letterClasses}
             style={style}
             onClick={() => {
                 const letterSource =
@@ -78,7 +75,7 @@ function Canvas(props: { app: App }): JSX.Element {
 
 function TopRow(props: { app: App }): JSX.Element {
     return (
-        <div className="top-row flex justify-center bg-gray-300 p-4">
+        <div className="top-row flex justify-center bg-gray-300 p-4 gap-1">
             {props.app.word.map((letter) => (
                 <BoxedLetter
                     key={letter.character}
@@ -157,6 +154,15 @@ function ReactApp(props: {
         props.container.on('disposed', updateConnectionState);
     }, []);
 
+    const canvasStyle: React.CSSProperties = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        paddingTop: '100px',
+    };
+
     return (
         <div className="app flex flex-col items-center w-full h-full">
             <Header
@@ -165,7 +171,9 @@ function ReactApp(props: {
                 clientId={'testUser'}
             />
             <TopRow app={appRoot} />
-            <Canvas app={appRoot} />
+            <div style={canvasStyle}>
+                <Canvas app={appRoot} />
+            </div>
         </div>
     );
 }
@@ -203,13 +211,14 @@ async function main() {
             .repeat(5)
             .split('')
             .map((character) => {
-                const pos = getRandomPosition(50);
+                const x = Math.floor(Math.random() * window.innerWidth);
+                const y = Math.floor(Math.random() * window.innerHeight);
                 appData.root.letters.insertAtEnd(
                     // TODO: error when not adding wrapping [] is inscrutable
                     [
                         letter.create({
-                            x: pos.x,
-                            y: pos.y,
+                            x,
+                            y,
                             character,
                             id: id.toString(),
                         }),
