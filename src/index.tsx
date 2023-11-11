@@ -10,7 +10,11 @@ import { IFluidContainer } from 'fluid-framework';
 import { Tree } from '@fluid-experimental/tree2';
 import './output.css';
 
-function BoxedLetter(props: { app: App; letter: Letter; cellSize: { x: number; y: number } }): JSX.Element {
+function BoxedLetter(props: {
+    app: App;
+    letter: Letter;
+    cellSize: { x: number; y: number };
+}): JSX.Element {
     const letterSource =
         Tree.parent(props.letter) === props.app.word
             ? props.app.word
@@ -63,22 +67,38 @@ function Canvas(props: {
     };
 
     return (
-        <div className="relative w-full h-full self-center bg-transparent" style={style}
-        onClick={(e: React.MouseEvent) => {
-            e.preventDefault();            
-        }}>
+        <div
+            className="relative w-full h-full self-center bg-transparent"
+            style={style}
+            onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+            }}
+        >
             {props.app.letters.map((letter) => (
-                <BoxedLetter key={letter.id} app={props.app} letter={letter} cellSize={props.cellSize} />
+                <BoxedLetter
+                    key={letter.id}
+                    app={props.app}
+                    letter={letter}
+                    cellSize={props.cellSize}
+                />
             ))}
         </div>
     );
 }
 
-function TopRow(props: { app: App, cellSize: { x: number; y: number }; }): JSX.Element {
+function TopRow(props: {
+    app: App;
+    cellSize: { x: number; y: number };
+}): JSX.Element {
     return (
         <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16">
             {props.app.word.map((letter) => (
-                <BoxedLetter key={letter.id} app={props.app} letter={letter} cellSize={props.cellSize} />
+                <BoxedLetter
+                    key={letter.id}
+                    app={props.app}
+                    letter={letter}
+                    cellSize={props.cellSize}
+                />
             ))}
         </div>
     );
@@ -108,7 +128,11 @@ function ReactApp(props: {
     return (
         <div className="flex flex-col justify-items-center w-full h-full">
             <TopRow app={appRoot} cellSize={props.cellSize} />
-            <Canvas app={appRoot} canvasSize={props.canvasSize} cellSize={props.cellSize} />
+            <Canvas
+                app={appRoot}
+                canvasSize={props.canvasSize}
+                cellSize={props.cellSize}
+            />
         </div>
     );
 }
@@ -137,7 +161,7 @@ async function main() {
     const canvasSize = { x: 20, y: 20 }; // characters across and down
 
     // If this is a new container, fill it with data
-    if (containerId.length == 0) {        
+    if (containerId.length == 0) {
         const used: { x: number; y: number }[] = [];
         let id = 0;
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -186,7 +210,14 @@ async function main() {
     // Render the app - note we attach new containers after render so
     // the app renders instantly on create new flow. The app will be
     // interactive immediately.
-    root.render(<ReactApp data={appData} container={container} canvasSize={canvasSize} cellSize={cellSize} />);
+    root.render(
+        <ReactApp
+            data={appData}
+            container={container}
+            canvasSize={canvasSize}
+            cellSize={cellSize}
+        />
+    );
 
     // If the app is in a `createNew` state - no containerId, and the container is detached, we attach the container.
     // This uploads the container to the service and connects to the collaboration session.
