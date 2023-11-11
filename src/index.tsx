@@ -2,17 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-    initializeSharedTree,
     loadFluidData,
-    lettersContainerSchema,
+    containerSchema,
 } from './infra/fluid';
 import { initializeDevtools } from '@fluid-experimental/devtools';
 import { devtoolsLogger } from './infra/clientProps';
-import { ISharedTree } from '@fluid-experimental/tree2';
+import { ITree, TreeView } from '@fluid-experimental/tree2';
 import { appSchemaConfig, App, letter, Letter } from './schema';
-import { SharedTree } from './infra/fluid';
 import { ConnectionState, IFluidContainer } from 'fluid-framework';
-import { node as Tree } from '@fluid-experimental/tree2';
+import { Tree } from '@fluid-experimental/tree2';
 import './output.css';
 
 function BoxedLetter(props: {
@@ -107,7 +105,7 @@ function Header(props: {
 }
 
 function ReactApp(props: {
-    data: SharedTree<App>;
+    data: TreeView<App>;
     container: IFluidContainer;
 }): JSX.Element {
     const [invalidations, setInvalidations] = useState(0);
@@ -192,20 +190,12 @@ async function main() {
     let containerId = location.hash.substring(1);
 
     // Initialize Fluid Container
-    const { container } = await loadFluidData(containerId, lettersContainerSchema);
+    const { container } = await loadFluidData(containerId, containerSchema);
+    
+    // Initialize the SharedTree Data Structure
+    const appData = (container.initialObjects.appData as ITree).schematize(appSchemaConfig);
 
-    if (containerId.length == 0) {
-        // Initialize our Fluid data -- set default values, establish relationships, etc.
-        (container.initialObjects.appData as ISharedTree).schematize(
-            appSchemaConfig
-        );
-    }
-
-    const appData = initializeSharedTree<App>(
-        container.initialObjects.appData,
-        appSchemaConfig
-    );
-
+    // If this is a new container, fill it with data
     if (containerId.length == 0) {
         let id = 0;
         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

@@ -1,8 +1,8 @@
 import {
     AllowedUpdateType,
-    InitializeAndSchematizeConfiguration,
     ProxyNode,
     SchemaBuilder,
+    buildTreeConfiguration,
 } from '@fluid-experimental/tree2';
 
 const sb = new SchemaBuilder({ scope: 'fc1db2e8-0a00-11ee-be56-0242ac120002' });
@@ -24,11 +24,11 @@ export type Letter = ProxyNode<typeof letter>;
 
 export const appSchema = sb.intoSchema(app);
 
-export const appSchemaConfig: InitializeAndSchematizeConfiguration = {
+export const appSchemaConfig = buildTreeConfiguration({
     schema: appSchema,
     initialTree: {
-        letters: [],
-        word: [],
+        letters: {"":[]},
+        word: {"":[]},
     },
     allowedSchemaModifications: AllowedUpdateType.SchemaCompatible,
-};
+});
