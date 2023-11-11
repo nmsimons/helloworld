@@ -20,8 +20,8 @@ function BoxedLetter(props: { app: App; letter: Letter; cellSize: { x: number; y
 
     const letterClasses = `letter ${
         isOnCanvas
-            ? 'absolute text-center cursor-pointer text-xl'
-            : 'cursor-pointer text-center tracking-widest text-2xl'
+            ? 'absolute text-center cursor-pointer text-xl select-none'
+            : 'cursor-pointer text-center tracking-widest text-2xl select-none'
     }`;
 
     const style: React.CSSProperties = isOnCanvas
@@ -37,7 +37,8 @@ function BoxedLetter(props: { app: App; letter: Letter; cellSize: { x: number; y
         <div
             className={letterClasses}
             style={style}
-            onClick={() => {
+            onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
                 const letterDest =
                     letterSource === props.app.letters
                         ? props.app.word
@@ -62,7 +63,10 @@ function Canvas(props: {
     };
 
     return (
-        <div className="relative w-full h-full self-center bg-transparent" style={style}>
+        <div className="relative w-full h-full self-center bg-transparent" style={style}
+        onClick={(e: React.MouseEvent) => {
+            e.preventDefault();            
+        }}>
             {props.app.letters.map((letter) => (
                 <BoxedLetter key={letter.id} app={props.app} letter={letter} cellSize={props.cellSize} />
             ))}
