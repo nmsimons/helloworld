@@ -34,12 +34,13 @@ function TopLetter(props: { app: App; letter: Letter }): JSX.Element {
     const [isWinner, setIsWinner] = useState(false);
 
     useEffect(() => {
+        const topRow = props.app.word
+            .map((letter) => {
+                return letter.character;
+            })
+            .join('');
         if (
-            props.app.word
-                .map((letter) => {
-                    return letter.character;
-                })
-                .join('') == 'HELLO'
+            topRow == 'HELLO' || topRow == 'HELLOWORLD'
         ) {
             setIsWinner(true);
         } else {

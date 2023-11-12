@@ -59,7 +59,7 @@ async function main() {
     if (containerId.length == 0) {
         const used: { x: number; y: number }[] = [];
         let id = 0;
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        'HELLOWORLD'
             .repeat(500)
             .split('')
             .map((character) => {
