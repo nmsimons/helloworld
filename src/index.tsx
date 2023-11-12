@@ -16,8 +16,6 @@ function CanvasLetter(props: {
     cellSize: { x: number; y: number };    
 }): JSX.Element {
 
-    const classes = `text-center cursor-pointer select-none absolute text-xl`;
-
     const style: React.CSSProperties = {
               left: `${props.letter.position.x}px`,
               top: `${props.letter.position.y}px`,
@@ -27,7 +25,7 @@ function CanvasLetter(props: {
 
     return (
         <div
-            className={classes}
+            className="text-center cursor-pointer select-none absolute text-xl"
             style={style}
             onClick={() => {                
                 const index = props.app.letters.indexOf(props.letter);
@@ -102,8 +100,7 @@ function Canvas(props: {
 }
 
 function TopRow(props: {
-    app: App;
-    cellSize: { x: number; y: number };
+    app: App;    
 }): JSX.Element {
     return (
         <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16">
@@ -141,7 +138,7 @@ function ReactApp(props: {
 
     return (
         <div className="flex flex-col justify-items-center w-full h-full">
-            <TopRow app={appRoot} cellSize={props.cellSize} />
+            <TopRow app={appRoot} />
             <Canvas
                 app={appRoot}
                 canvasSize={props.canvasSize}
