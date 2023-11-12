@@ -169,7 +169,7 @@ async function main() {
     );
 
     const cellSize = { x: 32, y: 32 };
-    const canvasSize = { x: 20, y: 20 }; // characters across and down
+    const canvasSize = { x: 10, y: 10 }; // characters across and down
     
     // Initialize debugging tools
     initializeDevtools({
