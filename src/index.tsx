@@ -10,45 +10,60 @@ import { IFluidContainer } from 'fluid-framework';
 import { Tree } from '@fluid-experimental/tree2';
 import './output.css';
 
-function BoxedLetter(props: {
+function CanvasLetter(props: {
     app: App;
     letter: Letter;
-    cellSize: { x: number; y: number };
+    cellSize: { x: number; y: number };    
 }): JSX.Element {
-    const letterSource =
-        Tree.parent(props.letter) === props.app.word
-            ? props.app.word
-            : props.app.letters;
 
-    const isOnCanvas = letterSource === props.app.letters;
+    const classes = `text-center cursor-pointer select-none absolute text-xl`;
 
-    const letterClasses = `letter ${
-        isOnCanvas
-            ? 'absolute text-center cursor-pointer text-xl select-none'
-            : 'cursor-pointer text-center tracking-widest text-2xl select-none'
-    }`;
-
-    const style: React.CSSProperties = isOnCanvas
-        ? {
+    const style: React.CSSProperties = {
               left: `${props.letter.position.x}px`,
               top: `${props.letter.position.y}px`,
               width: `${props.cellSize.x}px`,
               height: `${props.cellSize.y}px`,
-          }
-        : {};
+          };
 
     return (
         <div
-            className={letterClasses}
+            className={classes}
             style={style}
-            onClick={(e: React.MouseEvent) => {
-                e.preventDefault();
-                const letterDest =
-                    letterSource === props.app.letters
-                        ? props.app.word
-                        : props.app.letters;
-                const index = letterSource.indexOf(props.letter);
-                letterDest.moveToEnd(index, letterSource);
+            onClick={() => {                
+                const index = props.app.letters.indexOf(props.letter);
+                if (index != -1) props.app.word.moveToEnd(index, props.app.letters);
+            }}
+        >
+            {props.letter.character}
+        </div>
+    );
+}
+
+function TopLetter(props: {
+    app: App;
+    letter: Letter;        
+}): JSX.Element {
+
+    const [isWinner, setIsWinner] = useState(false);
+    
+    useEffect(() => {        
+        if (props.app.word.map((letter) => {return letter.character} ).join("") == "HELLO") {
+            setIsWinner(true);
+        } else {
+            setIsWinner(false);
+        }        
+    }, [props.app.word.length])    
+
+    const classes = (`text-center cursor-pointer select-none transition-all tracking-widest text-2xl ${
+        isWinner ? ' font-extrabold text-3xl' : ' animate-bounce text-2xl'
+    }`);
+
+    return (
+        <div
+            className={classes}            
+            onClick={() => {                                
+                const index = props.app.word.indexOf(props.letter);
+                if (index != -1) props.app.letters.moveToEnd(index, props.app.word);
             }}
         >
             {props.letter.character}
@@ -75,7 +90,7 @@ function Canvas(props: {
             }}
         >
             {props.app.letters.map((letter) => (
-                <BoxedLetter
+                <CanvasLetter
                     key={letter.id}
                     app={props.app}
                     letter={letter}
@@ -93,11 +108,10 @@ function TopRow(props: {
     return (
         <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16">
             {props.app.word.map((letter) => (
-                <BoxedLetter
+                <TopLetter
                     key={letter.id}
                     app={props.app}
-                    letter={letter}
-                    cellSize={props.cellSize}
+                    letter={letter}                    
                 />
             ))}
         </div>
@@ -159,6 +173,29 @@ async function main() {
 
     const cellSize = { x: 32, y: 32 };
     const canvasSize = { x: 20, y: 20 }; // characters across and down
+    
+    // Initialize debugging tools
+    initializeDevtools({
+        logger: devtoolsLogger,
+        initialContainers: [
+            {
+                container,
+                containerKey: 'My Container',
+            },
+        ],
+    });
+
+    // Render the app - note we attach new containers after render so
+    // the app renders instantly on create new flow. The app will be
+    // interactive immediately.
+    root.render(
+        <ReactApp
+            data={appData}
+            container={container}
+            canvasSize={canvasSize}
+            cellSize={cellSize}
+        />
+    );
 
     // If this is a new container, fill it with data
     if (containerId.length == 0) {
@@ -195,29 +232,6 @@ async function main() {
                 }
             });
     }
-
-    // Initialize debugging tools
-    initializeDevtools({
-        logger: devtoolsLogger,
-        initialContainers: [
-            {
-                container,
-                containerKey: 'My Container',
-            },
-        ],
-    });
-
-    // Render the app - note we attach new containers after render so
-    // the app renders instantly on create new flow. The app will be
-    // interactive immediately.
-    root.render(
-        <ReactApp
-            data={appData}
-            container={container}
-            canvasSize={canvasSize}
-            cellSize={cellSize}
-        />
-    );
 
     // If the app is in a `createNew` state - no containerId, and the container is detached, we attach the container.
     // This uploads the container to the service and connects to the collaboration session.
