@@ -4,6 +4,17 @@ import { App, Letter } from './schema';
 import { IFluidContainer } from 'fluid-framework';
 import { Tree } from '@fluid-experimental/tree2';
 
+export function Explanation(): JSX.Element {
+    return (
+        <div className="flex flex-col max-w-md gap-4 justify-left my-32 select-none">
+            <div className="text-xl bg-black text-white p-2 rounded shadow-md">
+                Copy the full URL to another browser tab or send it to someone to see
+                that the data is synched between clients.
+            </div>            
+        </div>
+    );
+}
+
 function CanvasLetter(props: {
     app: App;
     letter: Letter;
@@ -39,14 +50,12 @@ function TopLetter(props: { app: App; letter: Letter }): JSX.Element {
                 return letter.character;
             })
             .join('');
-        if (
-            topRow == 'HELLO' || topRow == 'HELLOWORLD'
-        ) {
+        if (topRow == 'HELLO' || topRow == 'HELLOWORLD' || topRow == 'WORLD') {
             setIsWinner(true);
         } else {
             setIsWinner(false);
         }
-    }, [props.app.word.length]);
+    }, [props.app.word.length,]);
 
     const classes = `text-center cursor-pointer select-none transition-all tracking-widest text-2xl ${
         isWinner ? ' font-extrabold text-3xl' : ' animate-bounce text-2xl'
@@ -97,7 +106,7 @@ function Canvas(props: {
 
 function TopRow(props: { app: App }): JSX.Element {
     return (
-        <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16">
+        <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16 w-full h-full">
             {props.app.word.map((letter) => (
                 <TopLetter key={letter.id} app={props.app} letter={letter} />
             ))}
@@ -127,13 +136,14 @@ export function ReactApp(props: {
     }, [invalidations]);
 
     return (
-        <div className="flex flex-col justify-items-center w-full h-full">
+        <div className="flex flex-col justify-items-center items-center w-full h-full">
             <TopRow app={appRoot} />
             <Canvas
                 app={appRoot}
                 canvasSize={props.canvasSize}
                 cellSize={props.cellSize}
             />
+            <Explanation />
         </div>
     );
 }
