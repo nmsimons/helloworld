@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { TreeView } from '@fluid-experimental/tree2';
 import { App, Letter } from './schema';
 import { IFluidContainer } from 'fluid-framework';
@@ -7,10 +7,18 @@ import { Tree } from '@fluid-experimental/tree2';
 export function Explanation(): JSX.Element {
     return (
         <div className="flex flex-col max-w-md gap-4 justify-left my-32 select-none">
-            <div className="text-xl bg-black text-white p-4 rounded shadow-md">
+            <BlackBox>
                 Copy the full URL to another browser tab or send it to someone to see
                 that the data is synched between clients.
-            </div>            
+            </BlackBox>            
+        </div>
+    );
+}
+
+export function BlackBox(props: { children: ReactNode }): JSX.Element {
+    return (
+        <div className="text-xl bg-black text-white p-4 rounded shadow-md">
+            {props.children}
         </div>
     );
 }
@@ -106,7 +114,7 @@ function Canvas(props: {
 
 function TopRow(props: { app: App }): JSX.Element {
     return (
-        <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16 w-full h-full">
+        <div className="flex justify-center bg-gray-300 p-4 gap-1 h-16 w-full ">
             {props.app.word.map((letter) => (
                 <TopLetter key={letter.id} app={props.app} letter={letter} />
             ))}
