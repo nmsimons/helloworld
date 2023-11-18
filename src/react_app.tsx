@@ -37,7 +37,7 @@ function CanvasLetter(props: {
 
     return (
         <div
-            className="text-center cursor-pointer select-none absolute text-xl"
+            className="transition-all hover:scale-110 text-center cursor-pointer select-none absolute text-xl"
             style={style}
             onClick={() => {
                 const index = props.app.letters.indexOf(props.letter);
@@ -65,7 +65,7 @@ function TopLetter(props: { app: App; letter: Letter }): JSX.Element {
         }
     }, [props.app.word.length,]);
 
-    const classes = `text-center cursor-pointer select-none transition-all tracking-widest text-2xl ${
+    const classes = `transition-all text-center cursor-pointer select-none tracking-widest text-2xl ${
         isWinner ? ' font-extrabold text-3xl' : ' animate-bounce text-2xl'
     }`;
 
