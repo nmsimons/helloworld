@@ -5,7 +5,7 @@ import { loadFluidData, containerSchema } from './infra/fluid';
 import { initializeDevtools } from '@fluid-experimental/devtools';
 import { devtoolsLogger } from './infra/clientProps';
 import { ITree } from '@fluid-experimental/tree2';
-import { appSchemaConfig, letter } from './schema';
+import { treeConfiguration, Letter } from './schema';
 import './output.css';
 import { ReactApp } from './react_app';
 
@@ -26,7 +26,7 @@ async function main() {
 
     // Initialize the SharedTree Data Structure
     const appData = (container.initialObjects.appData as ITree).schematize(
-        appSchemaConfig
+        treeConfiguration
     );
 
     const cellSize = { x: 32, y: 32 };
@@ -78,13 +78,12 @@ async function main() {
                     used.push(pos);
                     appData.root.letters.insertAtEnd(
                         // TODO: error when not adding wrapping [] is inscrutable
-                        [
-                            letter.create({
+                            new Letter({
                                 position: pos,
                                 character,
                                 id: id.toString(),
                             }),
-                        ]
+                        
                     );
                     id++;
                 }

@@ -1,39 +1,30 @@
-import {
-    AllowedUpdateType,
-    TypedNode,
-    SchemaBuilder,
-    buildTreeConfiguration,
+import {    
+    TreeConfiguration,
+    SchemaFactory
 } from '@fluid-experimental/tree2';
 
-const sb = new SchemaBuilder({ scope: 'fc1db2e8-0a00-11ee-be56-0242ac120002' });
+const sb = new SchemaFactory('fc1db2e8-0a00-11ee-be56-0242ac120002');
 
-export const position = sb.object('position', {
+export class Position extends sb.object('Position', {
     x: sb.number,
     y: sb.number,
-})
+}){}
 
-export const letter = sb.object('letter', {
-    position: position,
+export class Letter extends sb.object('Letter', {
+    position: Position,
     character: sb.string,
     id: sb.string,
-});
+}){}
 
-export const app = sb.object('app', {
-    letters: sb.list(letter),
-    word: sb.list(letter),
-});
+export class App extends sb.object('App', {
+    letters: sb.list(Letter),
+    word: sb.list(Letter),
+}) {}
 
-export type App = TypedNode<typeof app>;
-export type Letter = TypedNode<typeof letter>;
-export type Position = TypedNode<typeof position>;
-
-export const appSchema = sb.intoSchema(app);
-
-export const appSchemaConfig = buildTreeConfiguration({
-    schema: appSchema,
-    initialTree: {
-        letters: {"":[]},
-        word: {"":[]},
-    },
-    allowedSchemaModifications: AllowedUpdateType.SchemaCompatible,
-});
+export const treeConfiguration = new TreeConfiguration(
+    App,
+    () => ({
+        letters: [],
+        word: [],
+    }),    
+);
