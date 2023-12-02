@@ -1,8 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { TreeView } from '@fluid-experimental/tree2';
+import { TreeView, Tree } from '@fluid-experimental/tree2';
 import { App, Letter } from './schema';
 import { IFluidContainer } from 'fluid-framework';
-import { Tree } from '@fluid-experimental/tree2';
 
 export function Explanation(): JSX.Element {
     return (
