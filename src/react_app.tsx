@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { TreeView, Tree } from '@fluid-experimental/tree2';
+import { TreeView, Tree } from '@fluidframework/tree';
 import { App, Letter } from './schema';
 import { IFluidContainer } from 'fluid-framework';
 
