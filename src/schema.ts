@@ -3,22 +3,22 @@ import {
     SchemaFactory
 } from '@fluidframework/tree';
 
-const sb = new SchemaFactory('fc1db2e8-0a00-11ee-be56-0242ac120002');
+const sf = new SchemaFactory('fc1db2e8-0a00-11ee-be56-0242ac120002');
 
-export class Position extends sb.object('Position', {
-    x: sb.number,
-    y: sb.number,
+export class Position extends sf.object('Position', {
+    x: sf.number,
+    y: sf.number,
 }){}
 
-export class Letter extends sb.object('Letter', {
+export class Letter extends sf.object('Letter', {
     position: Position,
-    character: sb.string,
-    id: sb.string,
+    character: sf.string,
+    id: sf.string,
 }){}
 
-export class App extends sb.object('App', {
-    letters: sb.array(Letter),
-    word: sb.array(Letter),
+export class App extends sf.object('App', {
+    letters: sf.array(Letter),
+    word: sf.array(Letter),
 }) {}
 
 export const treeConfiguration = new TreeConfiguration(
