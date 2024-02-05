@@ -2,13 +2,18 @@ import {
     AzureMember,
     ITokenProvider,
     ITokenResponse,
+    IUser,
 } from '@fluidframework/azure-client';
 
 import axios from 'axios';
 import { Guid } from 'guid-typescript';
-import { IInsecureUser } from '@fluidframework/test-runtime-utils';
 
-const generateTestUser = (): IInsecureUser => {
+class TestUser implements IUser {
+    id!: string;
+    name!: string;    
+}
+
+const generateTestUser = (): TestUser => {
     const user = {
         id: Guid.create().toString(),
         name: '[TEST USER]',

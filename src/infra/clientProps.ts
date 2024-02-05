@@ -27,7 +27,7 @@ const remoteConnectionConfig: AzureRemoteConnectionConfig = {
 
 const localConnectionConfig: AzureLocalConnectionConfig = {
     type: 'local',
-    tokenProvider: new InsecureTokenProvider('VALUE_NOT_USED', user),
+    tokenProvider: new InsecureTokenProvider('VALUE_NOT_USED', '', '', user),
     endpoint: 'http://localhost:7070',
 };
 
